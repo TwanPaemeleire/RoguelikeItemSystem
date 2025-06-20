@@ -12,6 +12,17 @@ ABaseItem::ABaseItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	RootComponent = BoxComponent;
+	BoxComponent->SetBoxExtent(FVector(50.f));
+	BoxComponent->SetGenerateOverlapEvents(true);
+	BoxComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ABaseItem::OnOverlapBegin);
+
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	StaticMeshComponent->SetupAttachment(BoxComponent);
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABaseItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -30,33 +41,14 @@ void ABaseItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Othe
 void ABaseItem::BeginPlay()
 {
 	Super::BeginPlay();
-	UStaticMeshComponent* meshComponent = GetComponentByClass<UStaticMeshComponent>();
-	if (meshComponent)
-	{
-		meshComponent->SetStaticMesh(ItemData->Mesh);
-		meshComponent->SetMaterial(0, ItemData->Material);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("No StaticMeshComponent found in ABaseItem!"));
-	}
-
-	UBoxComponent* boxComponent = GetComponentByClass<UBoxComponent>();
-	if (boxComponent)
-	{
-		boxComponent->OnComponentBeginOverlap.AddDynamic(this, &ABaseItem::OnOverlapBegin);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("No BoxComponent found in ABaseItem!"));
-	}
-
+	StaticMeshComponent->SetStaticMesh(ItemData->Mesh);
+	StaticMeshComponent->SetMaterial(0, ItemData->Material);
+	DrawDebugBox(GetWorld(), BoxComponent->GetComponentLocation(), BoxComponent->GetScaledBoxExtent(), FColor::Red, true, 10.0f);
 }
 
 // Called every frame
 void ABaseItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

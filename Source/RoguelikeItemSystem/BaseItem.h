@@ -7,6 +7,8 @@
 #include "BaseItem.generated.h"
 
 class UItemData;
+class UBoxComponent;
+class UStaticMeshComponent;
 
 UCLASS(Abstract)
 class ROGUELIKEITEMSYSTEM_API ABaseItem : public AActor
@@ -19,11 +21,17 @@ public:
 	virtual void OnPickup() PURE_VIRTUAL(ABaseItem::OnPickup, );
 	virtual void OnDrop() PURE_VIRTUAL(ABaseItem::OnDrop, );
 
-	//UFUNCTION()
+	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditAnywhere)
 	UItemData* ItemData;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* BoxComponent;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* StaticMeshComponent;
 
 protected:
 	// Called when the game starts or when spawned
