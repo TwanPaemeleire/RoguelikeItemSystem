@@ -18,7 +18,7 @@ ABaseItem::ABaseItem()
 	BoxComponent->SetBoxExtent(FVector(50.f));
 	BoxComponent->SetGenerateOverlapEvents(true);
 	BoxComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ABaseItem::OnOverlapBegin);
+	//BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ABaseItem::OnOverlapBegin);
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(BoxComponent);
@@ -44,6 +44,26 @@ void ABaseItem::BeginPlay()
 	StaticMeshComponent->SetStaticMesh(ItemData->Mesh);
 	StaticMeshComponent->SetMaterial(0, ItemData->Material);
 	DrawDebugBox(GetWorld(), BoxComponent->GetComponentLocation(), BoxComponent->GetScaledBoxExtent(), FColor::Red, true, 10.0f);
+}
+
+void ABaseItem::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+	if (Player)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Collision with player detected in item"));
+		if (ItemData)
+		{
+			Player->GetItemInventory()->PickupItem(ItemData);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("ItemData is null in the ActorBeginOverlap function of ABaseItem"));
+		}
+		Destroy();
+	}
 }
 
 // Called every frame

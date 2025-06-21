@@ -25,7 +25,10 @@ void UItemInventory::PickupItem(UItemData* data)
 	if (foundInventorySlot)
 	{
 		++foundInventorySlot->Get()->amount;
-		//foundInventorySlot->Get()->itemLogicInstances.Emplace(MakeUnique<UBaseItemLogic>(this, data->LogicClass));
+
+		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, foundInventorySlot->Get()->itemData->LogicClass);
+		foundInventorySlot->Get()->itemLogicInstances.Emplace(NewLogic);
+		
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Added %s, now holding %d"),
@@ -38,6 +41,10 @@ void UItemInventory::PickupItem(UItemData* data)
 		TUniquePtr<InventorySlotData> newSlotInfo = MakeUnique<InventorySlotData>();
 		newSlotInfo.Get()->amount = 1;
 		newSlotInfo.Get()->itemData = data;
+
+		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, newSlotInfo->itemData->LogicClass);
+		newSlotInfo->itemLogicInstances.Emplace(NewLogic);
+
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("First pickup of %s, now holding %d"),
@@ -66,6 +73,7 @@ void UItemInventory::DropItem(UItemData* data, int amount)
 		}
 
 		slot->amount -= amount;
+		RemoveLogicInstances(slot, amount);
 
 		if (GEngine)
 		{
@@ -99,8 +107,7 @@ void UItemInventory::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	// ...	
 }
 
 
@@ -110,10 +117,16 @@ void UItemInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	for (TUniquePtr<InventorySlotData>& slot : m_Inventory)
 	{
-		for (TUniquePtr<UBaseItemLogic>& itemLogic : slot->itemLogicInstances)
+		for (TObjectPtr<UBaseItemLogic>& itemLogic : slot->itemLogicInstances)
 		{
 			itemLogic->Tick(DeltaTime);
 		}
 	}
+}
+
+void UItemInventory::RemoveLogicInstances(InventorySlotData* slot, int amount)
+{
+	amount = FMath::Clamp(amount, 0, slot->itemLogicInstances.Num());
+	slot->itemLogicInstances.RemoveAt(0, amount);
 }
 

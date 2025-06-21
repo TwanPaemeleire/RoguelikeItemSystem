@@ -13,7 +13,7 @@ struct InventorySlotData
 {
 	class UItemData* itemData;
 	int amount;
-	TArray<TUniquePtr<UBaseItemLogic>> itemLogicInstances;
+	TArray<TObjectPtr<UBaseItemLogic>> itemLogicInstances;
 };
 
 
@@ -25,8 +25,6 @@ class ROGUELIKEITEMSYSTEM_API UItemInventory : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UItemInventory();
-	//UItemInventory(const UItemInventory&) = delete;
-	//UItemInventory& operator=(const UItemInventory&) = delete;
 
 	void PickupItem(UItemData* data);
 	void DropItem(UItemData* data, int amount);
@@ -41,6 +39,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+	void RemoveLogicInstances(InventorySlotData* slot, int amount);
+
 	TArray<TUniquePtr<InventorySlotData>> m_Inventory{};
 		
 };
