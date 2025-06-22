@@ -29,7 +29,9 @@ void UItemInventory::PickupItem(UItemData* data)
 		++foundInventorySlot->amount;
 
 		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, foundInventorySlot->itemData->LogicClass);
+		NewLogic->OnPickedUp();
 		foundInventorySlot->itemLogicInstances.Emplace(NewLogic);
+
 		foundInventorySlot->widget->UpdateItemSlot(foundInventorySlot->amount);
 		
 		/*if (GEngine)
@@ -45,8 +47,9 @@ void UItemInventory::PickupItem(UItemData* data)
 		newSlotInfo.amount = 1;
 		newSlotInfo.itemData = data;
 
-		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, newSlotInfo.itemData->LogicClass);
-		newSlotInfo.itemLogicInstances.Emplace(NewLogic);
+		UBaseItemLogic* newLogic = NewObject<UBaseItemLogic>(this, newSlotInfo.itemData->LogicClass);
+		newLogic->OnPickedUp();
+		newSlotInfo.itemLogicInstances.Emplace(newLogic);
 
 		newSlotInfo.widget = ItemInventoryWidget->OnItemPickup(newSlotInfo.itemData);
 
@@ -97,6 +100,11 @@ void UItemInventory::DropItemAll(UItemData* data)
 
 	if (index != INDEX_NONE)
 	{
+		for (TObjectPtr<UBaseItemLogic>& itemLogic: m_Inventory[index].itemLogicInstances)
+		{
+			itemLogic->OnDropped();
+		}
+
 		ItemInventoryWidget->OnItemFullyDropped(m_Inventory[index].widget);
 		m_Inventory.RemoveAt(index);
 		/*if (GEngine)
@@ -135,6 +143,10 @@ void UItemInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 void UItemInventory::RemoveLogicInstances(FInventorySlotData* slot, int amount)
 {
 	amount = FMath::Clamp(amount, 0, slot->itemLogicInstances.Num());
+	for (int logicIdx = 0; logicIdx < amount; ++logicIdx)
+	{
+		slot->itemLogicInstances[logicIdx]->OnDropped();
+	}
 	slot->itemLogicInstances.RemoveAt(0, amount);
 }
 

@@ -37,6 +37,11 @@ void ABaseItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	}
 }
 
+void ABaseItem::OnPickUp()
+{
+	// Play VFX or anything else
+}
+
 // Called when the game starts or when spawned
 void ABaseItem::BeginPlay()
 {

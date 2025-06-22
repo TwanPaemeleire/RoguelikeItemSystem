@@ -18,11 +18,11 @@ class ROGUELIKEITEMSYSTEM_API ABaseItem : public AActor
 public:
 	// Sets default values for this actor's properties
 	ABaseItem();
-	virtual void OnPickup() PURE_VIRTUAL(ABaseItem::OnPickup, );
-	virtual void OnDrop() PURE_VIRTUAL(ABaseItem::OnDrop, );
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void OnPickUp();
 
 	UPROPERTY(EditAnywhere)
 	UItemData* ItemData;
