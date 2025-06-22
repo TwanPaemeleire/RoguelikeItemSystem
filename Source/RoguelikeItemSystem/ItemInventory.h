@@ -8,6 +8,7 @@
 
 class UItemData;
 class UBaseItemLogic;
+class UItemInventoryWidget;
 
 USTRUCT()
 struct FInventorySlotData
@@ -49,5 +50,11 @@ private:
 
 	UPROPERTY()
 	TArray<FInventorySlotData> m_Inventory{};
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UItemInventoryWidget> ItemInventoryWidgetClass;
+
+	UPROPERTY()
+	UItemInventoryWidget* ItemInventoryWidget;
 		
 };

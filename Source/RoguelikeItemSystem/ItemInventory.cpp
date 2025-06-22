@@ -4,6 +4,7 @@
 #include "ItemInventory.h"
 #include "ItemData.h"
 #include "BaseItemLogic.h"
+#include "ItemInventoryWidget.h"
 
 // Sets default values for this component's properties
 UItemInventory::UItemInventory()
@@ -44,6 +45,8 @@ void UItemInventory::PickupItem(UItemData* data)
 
 		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, newSlotInfo.itemData->LogicClass);
 		newSlotInfo.itemLogicInstances.Emplace(NewLogic);
+
+		ItemInventoryWidget->OnItemPickup(newSlotInfo.itemData);
 
 		if (GEngine)
 		{
@@ -108,6 +111,8 @@ void UItemInventory::BeginPlay()
 	Super::BeginPlay();
 
 	// ...	
+	ItemInventoryWidget = CreateWidget<UItemInventoryWidget>(GetWorld(), ItemInventoryWidgetClass, TEXT("ItemInventory"));
+	ItemInventoryWidget->AddToViewport();
 }
 
 

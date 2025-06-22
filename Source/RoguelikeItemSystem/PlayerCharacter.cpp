@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h" 
+#include "ItemInventoryWidget.h"
 
 #include "Camera/CameraComponent.h"
 
