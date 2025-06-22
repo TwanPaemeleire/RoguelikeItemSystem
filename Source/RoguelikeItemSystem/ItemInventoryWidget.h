@@ -8,6 +8,7 @@
 
 class UItemData;
 class UWrapBox;
+class UItemInventorySlotWidget;
 
 /**
  * 
@@ -17,12 +18,12 @@ class ROGUELIKEITEMSYSTEM_API UItemInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void OnItemPickup(const UItemData* itemData);
+	UItemInventorySlotWidget* OnItemPickup(const UItemData* itemData);
 private:
 
 	UPROPERTY(meta = (BindWidget))
 	UWrapBox* ItemInventoryWrapBox;
 
 	UPROPERTY(EditAnywhere, Category="ItemInventory")
-	TSubclassOf<UUserWidget> ItemSlotWidget;
+	TSubclassOf<UItemInventorySlotWidget> ItemSlotWidget;
 };

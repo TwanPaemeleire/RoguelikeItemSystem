@@ -4,9 +4,12 @@
 #include "ItemInventoryWidget.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
+#include "ItemInventorySlotWidget.h"
 
-void UItemInventoryWidget::OnItemPickup(const UItemData* itemData)
+UItemInventorySlotWidget* UItemInventoryWidget::OnItemPickup(const UItemData* itemData)
 {
-	UUserWidget* newSlot = CreateWidget(GetWorld(), ItemSlotWidget);
+	UItemInventorySlotWidget* newSlot = CreateWidget<UItemInventorySlotWidget>(GetWorld(), ItemSlotWidget);
+	newSlot->SetUpItemSlot(itemData);
 	ItemInventoryWrapBox->AddChildToWrapBox(newSlot);
+	return newSlot;
 }

@@ -9,6 +9,7 @@
 class UItemData;
 class UBaseItemLogic;
 class UItemInventoryWidget;
+class UItemInventorySlotWidget;
 
 USTRUCT()
 struct FInventorySlotData
@@ -21,6 +22,8 @@ struct FInventorySlotData
 	int amount;
 	UPROPERTY()
 	TArray<TObjectPtr<UBaseItemLogic>> itemLogicInstances;
+	UPROPERTY()
+	UItemInventorySlotWidget* widget;
 };
 
 
