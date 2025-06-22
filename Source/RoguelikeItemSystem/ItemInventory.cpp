@@ -17,54 +17,54 @@ UItemInventory::UItemInventory()
 
 void UItemInventory::PickupItem(UItemData* data)
 {
-	TUniquePtr<InventorySlotData>* foundInventorySlot = Algo::FindByPredicate(m_Inventory, [&](TUniquePtr<InventorySlotData>& slotData)
+	FInventorySlotData* foundInventorySlot = Algo::FindByPredicate(m_Inventory, [&](const FInventorySlotData& slotData)
 		{
-			return data->Name.CompareIndexes(slotData->itemData->Name) == 0;
+			return data->Name.CompareIndexes(slotData.itemData->Name) == 0;
 		});
 
 	if (foundInventorySlot)
 	{
-		++foundInventorySlot->Get()->amount;
+		++foundInventorySlot->amount;
 
-		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, foundInventorySlot->Get()->itemData->LogicClass);
-		foundInventorySlot->Get()->itemLogicInstances.Emplace(NewLogic);
+		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, foundInventorySlot->itemData->LogicClass);
+		foundInventorySlot->itemLogicInstances.Emplace(NewLogic);
 		
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Added %s, now holding %d"),
-				*foundInventorySlot->Get()->itemData->Name.ToString(),
-				foundInventorySlot->Get()->amount));
+				*foundInventorySlot->itemData->Name.ToString(),
+				foundInventorySlot->amount));
 		}
 	}
 	else
 	{
-		TUniquePtr<InventorySlotData> newSlotInfo = MakeUnique<InventorySlotData>();
-		newSlotInfo.Get()->amount = 1;
-		newSlotInfo.Get()->itemData = data;
+		FInventorySlotData newSlotInfo;
+		newSlotInfo.amount = 1;
+		newSlotInfo.itemData = data;
 
-		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, newSlotInfo->itemData->LogicClass);
-		newSlotInfo->itemLogicInstances.Emplace(NewLogic);
+		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, newSlotInfo.itemData->LogicClass);
+		newSlotInfo.itemLogicInstances.Emplace(NewLogic);
 
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("First pickup of %s, now holding %d"),
-				*newSlotInfo->itemData->Name.ToString(),
-				newSlotInfo->amount));
+				*newSlotInfo.itemData->Name.ToString(),
+				newSlotInfo.amount));
 		}
-		m_Inventory.Emplace(MoveTemp(newSlotInfo));
+		m_Inventory.Emplace(newSlotInfo);
 	}
 }
 
 void UItemInventory::DropItem(UItemData* data, int amount)
 {
-	int32 index = m_Inventory.IndexOfByPredicate([&](const TUniquePtr<InventorySlotData>& slotData)
+	int32 index = m_Inventory.IndexOfByPredicate([&](const FInventorySlotData& slotData)
 		{
-			return data->Name.CompareIndexes(slotData->itemData->Name) == 0;
+			return data->Name.CompareIndexes(slotData.itemData->Name) == 0;
 		});
 
 	if (index != INDEX_NONE)
 	{
-		InventorySlotData* slot = m_Inventory[index].Get();
+		FInventorySlotData* slot = &m_Inventory[index];
 
 		if (amount >= slot->amount)
 		{
@@ -85,9 +85,9 @@ void UItemInventory::DropItem(UItemData* data, int amount)
 
 void UItemInventory::DropItemAll(UItemData* data)
 {
-	int32 index = m_Inventory.IndexOfByPredicate([&](const TUniquePtr<InventorySlotData>& slotData)
+	int32 index = m_Inventory.IndexOfByPredicate([&](const FInventorySlotData& slotData)
 		{
-			return data->Name.CompareIndexes(slotData->itemData->Name) == 0;
+			return data->Name.CompareIndexes(slotData.itemData->Name) == 0;
 		});
 
 	if (index != INDEX_NONE)
@@ -95,7 +95,7 @@ void UItemInventory::DropItemAll(UItemData* data)
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Dropped all %s"),
-				*m_Inventory[index]->itemData->Name.ToString()));
+				*m_Inventory[index].itemData->Name.ToString()));
 		}
 		m_Inventory.RemoveAt(index);
 	}
@@ -115,16 +115,16 @@ void UItemInventory::BeginPlay()
 void UItemInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	for (TUniquePtr<InventorySlotData>& slot : m_Inventory)
+	for (FInventorySlotData& slot : m_Inventory)
 	{
-		for (TObjectPtr<UBaseItemLogic>& itemLogic : slot->itemLogicInstances)
+		for (TObjectPtr<UBaseItemLogic>& itemLogic : slot.itemLogicInstances)
 		{
 			itemLogic->Tick(DeltaTime);
 		}
 	}
 }
 
-void UItemInventory::RemoveLogicInstances(InventorySlotData* slot, int amount)
+void UItemInventory::RemoveLogicInstances(FInventorySlotData* slot, int amount)
 {
 	amount = FMath::Clamp(amount, 0, slot->itemLogicInstances.Num());
 	slot->itemLogicInstances.RemoveAt(0, amount);

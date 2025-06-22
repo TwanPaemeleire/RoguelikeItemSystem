@@ -9,10 +9,16 @@
 class UItemData;
 class UBaseItemLogic;
 
-struct InventorySlotData
+USTRUCT()
+struct FInventorySlotData
 {
+	GENERATED_BODY();
+
+	UPROPERTY()
 	class UItemData* itemData;
+	UPROPERTY()
 	int amount;
+	UPROPERTY()
 	TArray<TObjectPtr<UBaseItemLogic>> itemLogicInstances;
 };
 
@@ -39,8 +45,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	void RemoveLogicInstances(InventorySlotData* slot, int amount);
+	void RemoveLogicInstances(FInventorySlotData* slot, int amount);
 
-	TArray<TUniquePtr<InventorySlotData>> m_Inventory{};
+	UPROPERTY()
+	TArray<FInventorySlotData> m_Inventory{};
 		
 };
