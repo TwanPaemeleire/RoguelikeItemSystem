@@ -19,6 +19,7 @@ class ROGUELIKEITEMSYSTEM_API UItemInventoryWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	UItemInventorySlotWidget* OnItemPickup(const UItemData* itemData);
+	void OnItemFullyDropped(UItemInventorySlotWidget* slot);
 private:
 
 	UPROPERTY(meta = (BindWidget))

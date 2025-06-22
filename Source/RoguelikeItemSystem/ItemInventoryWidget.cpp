@@ -13,3 +13,8 @@ UItemInventorySlotWidget* UItemInventoryWidget::OnItemPickup(const UItemData* it
 	ItemInventoryWrapBox->AddChildToWrapBox(newSlot);
 	return newSlot;
 }
+
+void UItemInventoryWidget::OnItemFullyDropped(UItemInventorySlotWidget* slot)
+{
+	ItemInventoryWrapBox->RemoveChild(slot);
+}

@@ -30,13 +30,14 @@ void UItemInventory::PickupItem(UItemData* data)
 
 		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, foundInventorySlot->itemData->LogicClass);
 		foundInventorySlot->itemLogicInstances.Emplace(NewLogic);
+		foundInventorySlot->widget->UpdateItemSlot(foundInventorySlot->amount);
 		
-		if (GEngine)
+		/*if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Added %s, now holding %d"),
 				*foundInventorySlot->itemData->Name.ToString(),
 				foundInventorySlot->amount));
-		}
+		}*/
 	}
 	else
 	{
@@ -49,12 +50,12 @@ void UItemInventory::PickupItem(UItemData* data)
 
 		newSlotInfo.widget = ItemInventoryWidget->OnItemPickup(newSlotInfo.itemData);
 
-		if (GEngine)
+		/*if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("First pickup of %s, now holding %d"),
 				*newSlotInfo.itemData->Name.ToString(),
 				newSlotInfo.amount));
-		}
+		}*/
 		m_Inventory.Emplace(newSlotInfo);
 	}
 }
@@ -79,11 +80,11 @@ void UItemInventory::DropItem(UItemData* data, int amount)
 		slot->amount -= amount;
 		RemoveLogicInstances(slot, amount);
 
-		if (GEngine)
+		/*if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Dropped %d of %s, now holding %d"),
 				amount, *slot->itemData->Name.ToString(), slot->amount));
-		}
+		}*/
 	}
 }
 
@@ -96,12 +97,13 @@ void UItemInventory::DropItemAll(UItemData* data)
 
 	if (index != INDEX_NONE)
 	{
-		if (GEngine)
+		ItemInventoryWidget->OnItemFullyDropped(m_Inventory[index].widget);
+		m_Inventory.RemoveAt(index);
+		/*if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Dropped all %s"),
 				*m_Inventory[index].itemData->Name.ToString()));
-		}
-		m_Inventory.RemoveAt(index);
+		}*/
 	}
 }
 
