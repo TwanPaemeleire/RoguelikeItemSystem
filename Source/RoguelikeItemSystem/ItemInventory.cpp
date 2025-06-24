@@ -143,14 +143,20 @@ void UItemInventory::BeginPlay()
 	ItemInventoryWidget = CreateWidget<UItemInventoryWidget>(GetWorld(), ItemInventoryWidgetClass, TEXT("ItemInventory")); // Bind ownership to player instead of world in future?
 	ItemInventoryWidget->AddToViewport();
 
+
 	UItemDataManager* manager = GetWorld()->GetGameInstance()->GetSubsystem<UItemDataManager>();
-	UItemData* item = manager->GetRandomItem();
+	UItemData* item = manager->GetRandomItem({ TPair<EItemRarity, int>{EItemRarity::White, 5000},  { TPair<EItemRarity, int>{EItemRarity::Green, 1}} });
 	PickupItem(item);
 	PickupItem(item);
+	item = manager->GetRandomItem({ TPair<EItemRarity, int>{EItemRarity::White, 5000},  { TPair<EItemRarity, int>{EItemRarity::Green, 1}} });
 	PickupItem(item);
 	PickupItem(item);
-	DropItem(item, 2);
-	DropItem(item, 4);
+	item = manager->GetRandomItem({ TPair<EItemRarity, int>{EItemRarity::White, 5000},  { TPair<EItemRarity, int>{EItemRarity::Green, 1}} });
+	PickupItem(item);
+	PickupItem(item);
+	item = manager->GetRandomItem({ TPair<EItemRarity, int>{EItemRarity::White, 5000},  { TPair<EItemRarity, int>{EItemRarity::Green, 1}} });
+	PickupItem(item);
+	PickupItem(item);
 }
 
 
