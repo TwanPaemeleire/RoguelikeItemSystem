@@ -33,5 +33,8 @@ public:
 	UTexture2D* Icon;
 
 	UPROPERTY(EditAnywhere)
+	bool RunsLogicParallel;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UBaseItemLogic> LogicClass;
 };

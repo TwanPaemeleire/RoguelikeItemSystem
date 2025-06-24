@@ -6,6 +6,7 @@
 #include "BaseItemLogic.h"
 #include "ItemInventoryWidget.h"
 #include "ItemInventorySlotWidget.h"
+#include "ItemDataManager.h"
 
 // Sets default values for this component's properties
 UItemInventory::UItemInventory()
@@ -27,19 +28,26 @@ void UItemInventory::PickupItem(UItemData* data)
 	if (foundInventorySlot)
 	{
 		++foundInventorySlot->amount;
+		if (data->RunsLogicParallel)
+		{
+			UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, foundInventorySlot->itemData->LogicClass);
+			NewLogic->OnPickedUp();
+			foundInventorySlot->itemLogicInstances.Emplace(NewLogic);
+		}
+		else
+		{
+			foundInventorySlot->itemLogicInstances[0]->OnPickedUp();
+		}
 
-		UBaseItemLogic* NewLogic = NewObject<UBaseItemLogic>(this, foundInventorySlot->itemData->LogicClass);
-		NewLogic->OnPickedUp();
-		foundInventorySlot->itemLogicInstances.Emplace(NewLogic);
 
 		foundInventorySlot->widget->UpdateItemSlot(foundInventorySlot->amount);
 		
-		/*if (GEngine)
+		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Added %s, now holding %d"),
 				*foundInventorySlot->itemData->Name.ToString(),
 				foundInventorySlot->amount));
-		}*/
+		}
 	}
 	else
 	{
@@ -53,12 +61,12 @@ void UItemInventory::PickupItem(UItemData* data)
 
 		newSlotInfo.widget = ItemInventoryWidget->OnItemPickup(newSlotInfo.itemData);
 
-		/*if (GEngine)
+		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("First pickup of %s, now holding %d"),
 				*newSlotInfo.itemData->Name.ToString(),
 				newSlotInfo.amount));
-		}*/
+		}
 		m_Inventory.Emplace(newSlotInfo);
 	}
 }
@@ -83,11 +91,11 @@ void UItemInventory::DropItem(UItemData* data, int amount)
 		slot->amount -= amount;
 		RemoveLogicInstances(slot, amount);
 
-		/*if (GEngine)
+		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Dropped %d of %s, now holding %d"),
 				amount, *slot->itemData->Name.ToString(), slot->amount));
-		}*/
+		}
 	}
 }
 
@@ -100,18 +108,28 @@ void UItemInventory::DropItemAll(UItemData* data)
 
 	if (index != INDEX_NONE)
 	{
-		for (TObjectPtr<UBaseItemLogic>& itemLogic: m_Inventory[index].itemLogicInstances)
+		if (m_Inventory[index].itemData->RunsLogicParallel)
 		{
-			itemLogic->OnDropped();
+			for (TObjectPtr<UBaseItemLogic>& itemLogic : m_Inventory[index].itemLogicInstances)
+			{
+				itemLogic->OnDropped();
+			}
+		}
+		else
+		{
+			for (int amountIdx = 0; amountIdx < m_Inventory[index].amount; ++amountIdx)
+			{
+				m_Inventory[index].itemLogicInstances[0]->OnDropped();
+			}
 		}
 
 		ItemInventoryWidget->OnItemFullyDropped(m_Inventory[index].widget);
-		m_Inventory.RemoveAt(index);
-		/*if (GEngine)
+		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Dropped all %s"),
 				*m_Inventory[index].itemData->Name.ToString()));
-		}*/
+		}
+		m_Inventory.RemoveAt(index);
 	}
 }
 
@@ -122,8 +140,17 @@ void UItemInventory::BeginPlay()
 	Super::BeginPlay();
 
 	// ...	
-	ItemInventoryWidget = CreateWidget<UItemInventoryWidget>(GetWorld(), ItemInventoryWidgetClass, TEXT("ItemInventory"));
+	ItemInventoryWidget = CreateWidget<UItemInventoryWidget>(GetWorld(), ItemInventoryWidgetClass, TEXT("ItemInventory")); // Bind ownership to player instead of world in future?
 	ItemInventoryWidget->AddToViewport();
+
+	UItemDataManager* manager = GetWorld()->GetGameInstance()->GetSubsystem<UItemDataManager>();
+	UItemData* item = manager->GetRandomItem();
+	PickupItem(item);
+	PickupItem(item);
+	PickupItem(item);
+	PickupItem(item);
+	DropItem(item, 2);
+	DropItem(item, 4);
 }
 
 
@@ -142,11 +169,11 @@ void UItemInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UItemInventory::RemoveLogicInstances(FInventorySlotData* slot, int amount)
 {
-	amount = FMath::Clamp(amount, 0, slot->itemLogicInstances.Num());
 	for (int logicIdx = 0; logicIdx < amount; ++logicIdx)
 	{
-		slot->itemLogicInstances[logicIdx]->OnDropped();
+		if (slot->itemData->RunsLogicParallel) slot->itemLogicInstances[logicIdx]->OnDropped();
+		else slot->itemLogicInstances[0]->OnDropped();
 	}
-	slot->itemLogicInstances.RemoveAt(0, amount);
+	if (slot->itemData->RunsLogicParallel) slot->itemLogicInstances.RemoveAt(0, amount);
 }
 

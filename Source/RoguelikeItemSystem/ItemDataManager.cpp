@@ -35,5 +35,5 @@ void UItemDataManager::Initialize(FSubsystemCollectionBase& Collection)
 
 UItemData* UItemDataManager::GetRandomItem() const
 {
-	return nullptr;
+	return m_AllItems[0];
 }
