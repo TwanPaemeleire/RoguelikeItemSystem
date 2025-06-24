@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "ItemData.h"   
 #include "ItemDataManager.generated.h"
-
-class UItemData;
 
 /**
  * 
@@ -23,4 +22,5 @@ public:
 
 private:
 	TArray<UItemData*> m_AllItems;
+	TMap<EItemRarity, TArray<int>> m_ItemIndicesByRarity;
 };

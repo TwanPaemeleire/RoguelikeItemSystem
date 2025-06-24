@@ -11,6 +11,17 @@ class UBaseItemLogic;
 /**
  * 
  */
+
+UENUM()
+enum class EItemRarity : uint8
+{
+	White,
+	Green,
+	Red,
+	Orange
+};
+
+
 UCLASS(BlueprintType)
 class ROGUELIKEITEMSYSTEM_API UItemData : public UPrimaryDataAsset
 {
@@ -22,6 +33,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FText Description;
+
+	UPROPERTY(EditAnywhere)
+	EItemRarity Rarity;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh;

@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ItemDataManager.h"
-#include "ItemData.h"                         
+#include "ItemDataManager.h"                      
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/StreamableManager.h"                   
 #include "Engine/AssetManager.h"  
@@ -26,7 +25,8 @@ void UItemDataManager::Initialize(FSubsystemCollectionBase& Collection)
         UObject* loadedItem = streamableManager.LoadSynchronous(AssetData.ToSoftObjectPath(), true); // Make Async??
         if (UItemData* item = Cast<UItemData>(loadedItem))
         {
-            m_AllItems.Add(item);
+            int newItemIndex = m_AllItems.Add(item);
+            m_ItemIndicesByRarity.FindOrAdd(item->Rarity).Add(newItemIndex);
         }
     }
 
