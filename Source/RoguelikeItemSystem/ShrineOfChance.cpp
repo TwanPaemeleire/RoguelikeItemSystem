@@ -3,6 +3,9 @@
 
 #include "ShrineOfChance.h"
 #include "InteractableBox.h"
+#include "ItemDataManager.h"
+#include "PlayerCharacter.h"
+#include "ItemInventory.h"
 
 // Sets default values
 AShrineOfChance::AShrineOfChance()
@@ -10,21 +13,20 @@ AShrineOfChance::AShrineOfChance()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	InteractableBox = CreateDefaultSubobject<UInteractableBox>(TEXT("CustomInteractableBox"));
+	m_DropChances = 
+	{  
+		TPair<EItemRarity, int>(EItemRarity::White, 36),   
+		TPair<EItemRarity, int>(EItemRarity::Green, 9),
+		TPair<EItemRarity, int>(EItemRarity::Red, 1),
+		TPair<EItemRarity, int>(EItemRarity::Orange, 9),
+	};
+
+	InteractableBox = CreateDefaultSubobject<UInteractableBox>(TEXT("InteractableBox"));
 	RootComponent = InteractableBox;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(InteractableBox);
 	StaticMeshComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-
-	if (InteractableBox)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InteractableBox is NOT null in AShrineOfChance::AShrineOfChance"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("InteractableBox is null in AShrineOfChance::AShrineOfChance"));
-	}
 }
 
 // Called when the game starts or when spawned
@@ -34,7 +36,7 @@ void AShrineOfChance::BeginPlay()
 
 	if (InteractableBox)
 	{
-		InteractableBox->GetOnInteractEvent().AddLambda([this](APlayerCharacter* player)
+		m_InteractDelegateHandle = InteractableBox->GetOnInteractEvent().AddLambda([this](APlayerCharacter* player)
 			{
 				OnInteract(player);
 			});
@@ -48,6 +50,16 @@ void AShrineOfChance::BeginPlay()
 void AShrineOfChance::OnInteract(APlayerCharacter* player)
 {
 	UE_LOG(LogTemp, Warning, TEXT("INTERACTED WITH SHRINE"));
+	int randomNumber = FMath::RandRange(0, 100);
+	if (randomNumber <= m_ChanceForNothing) return; // Add maybe a red VFX or something to indicate player didn't get anything
+	UItemDataManager* manager = GetWorld()->GetGameInstance()->GetSubsystem<UItemDataManager>();
+	UItemData* randomItem = manager->GetRandomItem(m_DropChances);
+	player->GetItemInventory()->PickupItem(randomItem); // Instead of just picking it up, drop it on the ground in the future?
+	++m_AmountDropped;
+	if (m_AmountDropped >= m_MaxAmountOfDrops)
+	{
+		//InteractableBox->GetOnInteractEvent().Remove(m_InteractDelegateHandle); // Uncomment later when implementation is done, or bind to different function that just plays a sound/effect
+	}
 }
 
 // Called every frame

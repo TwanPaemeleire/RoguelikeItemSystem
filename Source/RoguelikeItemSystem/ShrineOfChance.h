@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ItemData.h"
 #include "ShrineOfChance.generated.h"
 
 class UInteractableBox;
@@ -33,5 +34,13 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+private: 
+	TArray<TPair<EItemRarity, int>> m_DropChances;
+	int m_ChanceForNothing{ 45 };
+	int m_MaxAmountOfDrops{ 2 };
+	int m_AmountDropped{ 0 };
+	FDelegateHandle m_InteractDelegateHandle;
+
 
 };

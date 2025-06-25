@@ -39,7 +39,7 @@ UItemData* UItemDataManager::GetRandomItem(const TArray<TPair<EItemRarity, int>>
     EItemRarity randomRarity = GetRandomWeightedRarity(weightedRarities);
     int amountOfSelectedRarity = m_ItemIndicesByRarity[randomRarity].Num();
     int randomItemIdx = FMath::RandRange(0, amountOfSelectedRarity - 1);
-    return m_AllItems[randomItemIdx];
+    return m_AllItems[m_ItemIndicesByRarity[randomRarity][randomItemIdx]];
 }
 
 EItemRarity UItemDataManager::GetRandomWeightedRarity(const TArray<TPair<EItemRarity, int>>& weightedRarities) const
