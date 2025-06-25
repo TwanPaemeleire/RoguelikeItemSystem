@@ -16,13 +16,38 @@ AShrineOfChance::AShrineOfChance()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(InteractableBox);
 	StaticMeshComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+
+	if (InteractableBox)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InteractableBox is NOT null in AShrineOfChance::AShrineOfChance"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("InteractableBox is null in AShrineOfChance::AShrineOfChance"));
+	}
 }
 
 // Called when the game starts or when spawned
 void AShrineOfChance::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (InteractableBox)
+	{
+		InteractableBox->GetOnInteractEvent().AddLambda([this](APlayerCharacter* player)
+			{
+				OnInteract(player);
+			});
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("InteractableBox is null in AShrineOfChance::BeginPlay"));
+	}
+}
+
+void AShrineOfChance::OnInteract(APlayerCharacter* player)
+{
+	UE_LOG(LogTemp, Warning, TEXT("INTERACTED WITH SHRINE"));
 }
 
 // Called every frame

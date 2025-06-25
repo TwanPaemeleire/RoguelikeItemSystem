@@ -6,10 +6,13 @@
 #include "Components/BoxComponent.h"
 #include "InteractableBox.generated.h"
 
+class APlayerCharacter;
+
 /**
  * 
  */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractableOverlap, AActor*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteract, APlayerCharacter*);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ROGUELIKEITEMSYSTEM_API UInteractableBox : public UBoxComponent
@@ -27,7 +30,15 @@ protected:
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+public:
+	void Interact(APlayerCharacter* character);
+
+	FOnInteractableOverlap& GetOnBeginOverlapEvent() { return OnBeginOverlap; }
+	FOnInteractableOverlap& GetOnEndOverlapEvent() { return OnEndOverlap; }
+	FOnInteract& GetOnInteractEvent() { return OnInteract; }
+
 private:
 	FOnInteractableOverlap OnBeginOverlap;
 	FOnInteractableOverlap OnEndOverlap;
+	FOnInteract OnInteract;
 };

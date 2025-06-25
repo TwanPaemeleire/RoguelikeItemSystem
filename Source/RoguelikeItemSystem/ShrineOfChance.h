@@ -8,6 +8,7 @@
 
 class UInteractableBox;
 class UStaticMeshComponent;
+class APlayerCharacter;
 
 UCLASS()
 class ROGUELIKEITEMSYSTEM_API AShrineOfChance : public AActor
@@ -26,6 +27,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	void OnInteract(APlayerCharacter* player);
 
 public:	
 	// Called every frame

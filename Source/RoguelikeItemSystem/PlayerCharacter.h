@@ -11,6 +11,7 @@ class UCameraComponent;
 class UInputAction;
 struct FInputActionValue;
 class UInputMappingContext;
+class UInteractableBox;
 
 
 UCLASS()
@@ -34,17 +35,24 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Move(const FInputActionValue& Value);
+	void Interact(const FInputActionValue& Value);
 
 	UItemInventory* GetItemInventory() const { return m_ItemInventory; }
+	void SetInteractableInRange(UInteractableBox* interactable) { m_InteractableInRange = interactable; }
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* InteractAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* InputContext;
 
 private:
 	UItemInventory* m_ItemInventory{};
+
+	UInteractableBox* m_InteractableInRange{nullptr};
 
 	UPROPERTY(EditAnywhere)
 	UCameraComponent* m_Camera;

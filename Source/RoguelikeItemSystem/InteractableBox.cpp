@@ -2,6 +2,7 @@
 
 
 #include "InteractableBox.h"
+#include "PlayerCharacter.h"
 
 void UInteractableBox::BeginPlay()
 {
@@ -15,9 +16,13 @@ void UInteractableBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 {
     if (OtherActor && OtherActor != GetOwner())
     {
-        UE_LOG(LogTemp, Warning, TEXT("OVERLAP BEGIN"));
-
-        OnBeginOverlap.Broadcast(OtherActor);
+        APlayerCharacter* player = Cast<APlayerCharacter>(OtherActor);
+        if (player)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("OVERLAP BEGIN WITH PLAYER CHAR"));
+            player->SetInteractableInRange(this);
+            OnBeginOverlap.Broadcast(OtherActor);
+        }
     }
 }
 
@@ -25,7 +30,17 @@ void UInteractableBox::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AA
 {
     if (OtherActor && OtherActor != GetOwner())
     {
-        UE_LOG(LogTemp, Warning, TEXT("OVERLAP END"));
-        OnEndOverlap.Broadcast(OtherActor);
+        APlayerCharacter* player = Cast<APlayerCharacter>(OtherActor);
+        if (player)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("OVERLAP END WITH PLAYER CHAR"));
+            player->SetInteractableInRange(nullptr);
+            OnEndOverlap.Broadcast(OtherActor);
+        }
     }
+}
+
+void UInteractableBox::Interact(APlayerCharacter* character)
+{
+    OnInteract.Broadcast(character);
 }

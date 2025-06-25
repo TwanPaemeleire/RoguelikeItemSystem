@@ -8,6 +8,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h" 
 #include "ItemInventoryWidget.h"
+#include "InteractableBox.h"
 
 #include "Camera/CameraComponent.h"
 
@@ -55,6 +56,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Interact);
 	}
 }
 
@@ -66,5 +68,13 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 
 	AddMovementInput(GetActorForwardVector(), input.Y);
 	AddMovementInput(GetActorRightVector(), input.X);
+}
+
+void APlayerCharacter::Interact(const FInputActionValue& Value)
+{
+	if (m_InteractableInRange != nullptr)
+	{
+		m_InteractableInRange->Interact(this);
+	}
 }
 
