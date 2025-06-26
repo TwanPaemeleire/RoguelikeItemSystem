@@ -34,28 +34,28 @@ void UItemDataManager::Initialize(FSubsystemCollectionBase& Collection)
     UE_LOG(LogTemp, Warning, TEXT("AMOUNT OF ITEMS LOADED: %d"), m_AllItems.Num());
 }
 
-UItemData* UItemDataManager::GetRandomItem(const TArray<TPair<EItemRarity, int>>& weightedRarities) const
+UItemData* UItemDataManager::GetRandomItem(const TMap<EItemRarity, int>& dropTable) const
 {
-    EItemRarity randomRarity = GetRandomWeightedRarity(weightedRarities);
+    EItemRarity randomRarity = GetRandomWeightedRarity(dropTable);
     int amountOfSelectedRarity = m_ItemIndicesByRarity[randomRarity].Num();
     int randomItemIdx = FMath::RandRange(0, amountOfSelectedRarity - 1);
     return m_AllItems[m_ItemIndicesByRarity[randomRarity][randomItemIdx]];
 }
 
-EItemRarity UItemDataManager::GetRandomWeightedRarity(const TArray<TPair<EItemRarity, int>>& weightedRarities) const
+EItemRarity UItemDataManager::GetRandomWeightedRarity(const TMap<EItemRarity, int>& dropTable) const
 {
-    int totalWeight = Algo::Accumulate(weightedRarities, 0, [](int32 accumulated, const TPair<EItemRarity, int>& weightedRarity)
+    int totalWeight = Algo::Accumulate(dropTable, 0, [](int32 accumulated, const TPair<EItemRarity, int>& dropPair)
         {
-            return accumulated + weightedRarity.Value;
+            return accumulated + dropPair.Value;
         });
     int randomNumber = FMath::RandRange(0, totalWeight - 1);
 
-    int randRarityIndex = weightedRarities.IndexOfByPredicate([&randomNumber](const TPair<EItemRarity, int>& weightedRarity)
+    auto result = Algo::FindByPredicate(dropTable, [&randomNumber](const TPair<EItemRarity, int>& dropPair)
         {
-            if (randomNumber < weightedRarity.Value) return true;
-            randomNumber -= weightedRarity.Value;
+            if (randomNumber < dropPair.Value) return true;
+            randomNumber -= dropPair.Value;
             return false;
         });
 
-    return weightedRarities[randRarityIndex].Key;
+    return result->Key;
 }

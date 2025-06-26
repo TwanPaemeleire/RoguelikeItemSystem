@@ -36,7 +36,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private: 
-	TArray<TPair<EItemRarity, int>> m_DropChances;
+	TMap<EItemRarity, int> m_DropChances;
 	int m_ChanceForNothing{ 45 };
 	int m_MaxAmountOfDrops{ 2 };
 	int m_AmountDropped{ 0 };
