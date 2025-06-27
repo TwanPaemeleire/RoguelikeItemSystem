@@ -28,6 +28,11 @@ void UItemDataManager::Initialize(FSubsystemCollectionBase& Collection)
         {
             int newItemIndex = m_AllItems.Add(item);
             m_ItemIndicesByRarity.FindOrAdd(item->Rarity).Add(newItemIndex);
+            TArray<EItemCategory> categories = item->Categories;
+            for (const EItemCategory& category : categories)
+            {
+                m_ItemIndicesByCategory.FindOrAdd(category).FindOrAdd(item->Rarity).Add(newItemIndex);
+            }
         }
     }
 
@@ -40,6 +45,11 @@ UItemData* UItemDataManager::GetRandomItem(const TMap<EItemRarity, int>& dropTab
     int amountOfSelectedRarity = m_ItemIndicesByRarity[randomRarity].Num();
     int randomItemIdx = FMath::RandRange(0, amountOfSelectedRarity - 1);
     return m_AllItems[m_ItemIndicesByRarity[randomRarity][randomItemIdx]];
+}
+
+UItemData* UItemDataManager::GetRandomItem(const TMap<EItemRarity, int>& dropTable, EItemCategory category) const
+{
+    return nullptr;
 }
 
 EItemRarity UItemDataManager::GetRandomWeightedRarity(const TMap<EItemRarity, int>& dropTable) const

@@ -22,7 +22,7 @@ enum class EItemRarity : uint8
 };
 
 UENUM()
-enum class EItemCategroy : uint8
+enum class EItemCategory : uint8
 {
 	Damage,
 	Healing,
@@ -46,7 +46,7 @@ public:
 	EItemRarity Rarity;
 
 	UPROPERTY(EditAnywhere)
-	TArray<EItemCategroy> Categories;
+	TArray<EItemCategory> Categories;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh;
