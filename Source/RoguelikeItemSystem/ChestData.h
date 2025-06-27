@@ -23,6 +23,12 @@ public:
 	TMap<EItemRarity, int> DropTable;
 
 	UPROPERTY(EditAnywhere)
+	bool IsNonDefaultChest;
+
+	UPROPERTY(EditAnywhere)
+	EItemCategroy ChestCategory;
+
+	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh;
 
 	UPROPERTY(EditAnywhere)

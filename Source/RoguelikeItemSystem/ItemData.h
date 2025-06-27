@@ -21,6 +21,14 @@ enum class EItemRarity : uint8
 	Orange
 };
 
+UENUM()
+enum class EItemCategroy : uint8
+{
+	Damage,
+	Healing,
+	Utility
+};
+
 
 UCLASS(BlueprintType)
 class ROGUELIKEITEMSYSTEM_API UItemData : public UPrimaryDataAsset
@@ -36,6 +44,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	EItemRarity Rarity;
+
+	UPROPERTY(EditAnywhere)
+	TArray<EItemCategroy> Categories;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh;
