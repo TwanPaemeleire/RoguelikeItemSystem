@@ -26,7 +26,7 @@ public:
 	bool IsNonDefaultChest;
 
 	UPROPERTY(EditAnywhere)
-	EItemCategroy ChestCategory;
+	EItemCategory ChestCategory;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh;
