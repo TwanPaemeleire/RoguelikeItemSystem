@@ -49,7 +49,10 @@ UItemData* UItemDataManager::GetRandomItem(const TMap<EItemRarity, int>& dropTab
 
 UItemData* UItemDataManager::GetRandomItem(const TMap<EItemRarity, int>& dropTable, EItemCategory category) const
 {
-    return nullptr;
+    EItemRarity randomRarity = GetRandomWeightedRarity(dropTable);
+    int amountOfSelectedRarity = m_ItemIndicesByCategory[category][randomRarity].Num();
+    int randomItemIdx = FMath::RandRange(0, amountOfSelectedRarity - 1);
+    return m_AllItems[m_ItemIndicesByCategory[category][randomRarity][randomItemIdx]];
 }
 
 EItemRarity UItemDataManager::GetRandomWeightedRarity(const TMap<EItemRarity, int>& dropTable) const

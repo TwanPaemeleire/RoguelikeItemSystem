@@ -9,6 +9,7 @@
 class UChestData;
 class UStaticMeshComponent;
 class UInteractableBox;
+class APlayerCharacter;
 
 UCLASS()
 class ROGUELIKEITEMSYSTEM_API ABaseChest : public AActor
@@ -22,6 +23,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void OnInteract(APlayerCharacter* player);
 
 public:	
 	// Called every frame
@@ -36,4 +38,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UInteractableBox* InteractableBox;
+
+	FDelegateHandle m_InteractDelegateHandle;
 };

@@ -3,6 +3,9 @@
 #include "BaseChest.h"
 #include "InteractableBox.h"
 #include "ChestData.h"
+#include "ItemDataManager.h"
+#include "PlayerCharacter.h"
+#include "ItemInventory.h"
 
 // Sets default values
 ABaseChest::ABaseChest()
@@ -26,6 +29,18 @@ void ABaseChest::BeginPlay()
 	StaticMeshComponent->SetMaterial(0, ChestData->Material);
 	StaticMeshComponent->SetGenerateOverlapEvents(false);
 	StaticMeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+
+	if (InteractableBox)
+	{
+		m_InteractDelegateHandle = InteractableBox->GetOnInteractEvent().AddLambda([this](APlayerCharacter* player)
+			{
+				OnInteract(player);
+			});
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("InteractableBox is null in ABaseChest::BeginPlay"));
+	}
 }
 
 // Called every frame
@@ -35,3 +50,24 @@ void ABaseChest::Tick(float DeltaTime)
 
 }
 
+void ABaseChest::OnInteract(APlayerCharacter* player)
+{
+	UItemDataManager* manager = GetWorld()->GetGameInstance()->GetSubsystem<UItemDataManager>();
+	UItemData* randomItem = nullptr;
+	if (ChestData->IsNonDefaultChest)
+	{
+		randomItem = manager->GetRandomItem(ChestData->DropTable, ChestData->ChestCategory);
+	}
+	else
+	{
+		randomItem = manager->GetRandomItem(ChestData->DropTable);
+	}
+	if(!randomItem)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No item found in the drop table for chest: %s"), *GetName());
+		return;
+	}
+	
+	player->GetItemInventory()->PickupItem(randomItem);
+	InteractableBox->GetOnInteractEvent().Remove(m_InteractDelegateHandle);
+}
