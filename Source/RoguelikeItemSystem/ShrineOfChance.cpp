@@ -54,11 +54,11 @@ void AShrineOfChance::OnInteract(APlayerCharacter* player)
 	if (randomNumber <= m_ChanceForNothing) return; // Add maybe a red VFX or something to indicate player didn't get anything
 	UItemDataManager* manager = GetWorld()->GetGameInstance()->GetSubsystem<UItemDataManager>();
 	UItemData* randomItem = manager->GetRandomItem(m_DropChances);
-	player->GetItemInventory()->PickupItem(randomItem); // Instead of just picking it up, drop it on the ground in the future?
+	player->GetItemInventory()->PickupItem(randomItem);
 	++m_AmountDropped;
 	if (m_AmountDropped >= m_MaxAmountOfDrops)
 	{
-		//InteractableBox->GetOnInteractEvent().Remove(m_InteractDelegateHandle); // Uncomment later when implementation is done, or bind to different function that just plays a sound/effect
+		InteractableBox->GetOnInteractEvent().Remove(m_InteractDelegateHandle);
 	}
 }
 
